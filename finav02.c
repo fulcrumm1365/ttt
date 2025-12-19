@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // PIC16F887 - NEC IR (Timer1) + Motor + PWM + HC-SR04 (Timer0) + LCD (CCS C)
-// KEY_3: LCD 1.sat�r "asd", 2.sat�r "qwe"
+// KEY_3: LCD 1.sat?r "asd", 2.sat?r "qwe"
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define LCD_RS_PIN      PIN_B1
@@ -19,11 +19,11 @@
 
 #include <lcd.c>
 
-// ---------------- Motor y�n pinleri ----------------
+// ---------------- Motor y?n pinleri ----------------
 #define MOTOR_IN1     PIN_D0
 #define MOTOR_IN2     PIN_D1
 #define MOTOR2_IN3    PIN_D2
-#define MOTOR2_IN4    PIN_D3   // RC6 UART TX ile �ak���r (terminal a�acaksan de�i�tir)
+#define MOTOR2_IN4    PIN_D3   // RC6 UART TX ile ?ak???r (terminal a?acaksan de?i?tir)
 
 // ---------------- PWM ----------------
 // PIC16F887: CCP1=RC2, CCP2=RC1  
@@ -32,20 +32,20 @@ unsigned int16 pwm_degeri = 500;
 #define PWM_MAX   1000
 #define PWM_STEP   100
 
-// ---------- NEC IR de�i�kenleri ----------
+// ---------- NEC IR de?i?kenleri ----------
 volatile int1 nec_ok = 0;
 volatile unsigned int8 nec_state = 0, command = 0, inv_command = 0, i = 0;
 volatile unsigned int16 address = 0;
 volatile unsigned int32 nec_code = 0;
 
-// Kumanda tu�lar� (senin de�erlerin)
+// Kumanda tu?lar? (senin de?erlerin)
 #define KEY_up     0x18
 #define KEY_down   0x4A
 #define KEY_right  0x5A
 #define KEY_left   0x10
 #define KEY_ok     0x38
-#define KEY_1      0xA2  // h�z +
-#define KEY_2      0x62  // h�z -
+#define KEY_1      0xA2  // h?z +
+#define KEY_2      0x62  // h?z -
 #define KEY_3      0xE2  // LCD asd/qwe
 
 // HC-SR04
@@ -56,7 +56,7 @@ volatile int16 distance_cm = -1;
 // KEY_3 ekran modu
 volatile int1 lcd_key3_mode = 0;
 
-// ---------------- Timer0 overflow counter (HC-SR04 �l��m� i�in) ----------------
+// ---------------- Timer0 overflow counter (HC-SR04 ?l??m? i?in) ----------------
 volatile unsigned int16 t0_ovf = 0;
 
 #INT_TIMER0
@@ -70,7 +70,7 @@ void pwm_apply(void){
    set_pwm2_duty(pwm_degeri);   // CCP2 -> RC1
 }
 
-// ---------- Motor fonksiyonlar� ----------
+// ---------- Motor fonksiyonlar? ----------
 void motors_stop(void){
   output_low(MOTOR_IN1);  output_low(MOTOR_IN2);
   output_low(MOTOR2_IN3); output_low(MOTOR2_IN4);
@@ -83,16 +83,16 @@ void motors_reverse(void){
   output_low(MOTOR_IN1); output_high(MOTOR_IN2);
   output_low(MOTOR2_IN3); output_high(MOTOR2_IN4);
 }
-void motors_turn_right(void){
+void motors_turn_left(void){
   output_high(MOTOR_IN1);  output_low(MOTOR_IN2);
   output_low(MOTOR2_IN3);  output_high(MOTOR2_IN4);
 }
-void motors_turn_left(void){
+void motors_turn_right(void){
   output_low(MOTOR_IN1);   output_high(MOTOR_IN2);
   output_high(MOTOR2_IN3); output_low(MOTOR2_IN4);
 }
 
-// LCD g�sterimi
+// LCD g?sterimi
 void lcd_show(void){
   if(lcd_key3_mode){
      lcd_gotoxy(1,1);
@@ -140,7 +140,7 @@ int16 hcsr04_get_cm_timer0(void)
       if(++guard > 30000) return -1;
    }
 
-   // �l��m ba�lat
+   // ?l??m ba?lat
    disable_interrupts(INT_TIMER0);
    t0_ovf = 0;
    set_timer0(0);
@@ -157,7 +157,7 @@ int16 hcsr04_get_cm_timer0(void)
       }
    }
 
-   // �l��m� al
+   // ?l??m? al
    disable_interrupts(INT_TIMER0);
    ticks = (t0_ovf * 256u) + get_timer0();
 
@@ -247,7 +247,7 @@ void main(){
    setup_adc(ADC_OFF);
 
    // RD0 TRIG output, RD1 ECHO input
-   set_tris_a(0x02)
+   set_tris_a(0x02);
    set_tris_d(0b00000010);
    set_tris_c(0x00);
 
@@ -259,10 +259,10 @@ void main(){
    setup_ccp2(CCP_PWM);
    pwm_apply();
 
-   // Timer1: IR i�in 1us/tick (4MHz -> Fosc/4 = 1MHz)
+   // Timer1: IR i?in 1us/tick (4MHz -> Fosc/4 = 1MHz)
    setup_timer_1(T1_INTERNAL | T1_DIV_BY_1);
 
-   // Timer0: HC-SR04 i�in (prescaler 1:4 => 4us/tick)
+   // Timer0: HC-SR04 i?in (prescaler 1:4 => 4us/tick)
    setup_timer_0(RTCC_INTERNAL | RTCC_DIV_4);
    clear_interrupt(INT_TIMER0);
    enable_interrupts(INT_TIMER0);
@@ -277,7 +277,7 @@ void main(){
    enable_interrupts(INT_EXT_H2L);
 
    while(TRUE){
-      // Mesafe �l�
+      // Mesafe ?l?
       distance_cm = hcsr04_get_cm_timer0();
 
       // IR komut geldiyse uygula
@@ -317,7 +317,7 @@ void main(){
             pwm_apply();
          }
          else if(command == KEY_3){
-            lcd_key3_mode = 1;   // �zel yaz� modu
+            lcd_key3_mode = 1;   // ?zel yaz? modu
          }
          else{
             lcd_key3_mode = 0;
